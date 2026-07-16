@@ -234,7 +234,7 @@
         <!-- IMAGE COMPOSITE — KINETIC -->
         <div class="img-composite">
           <div class="img-composite-frame">
-            <img src="Images_Metadata/Images/kinetic.png" alt="Kinetic architecture — moving wood louvre facade, three views" />
+            <img loading="lazy" src="Images_Metadata/Images/kinetic.png" alt="Kinetic architecture — moving wood louvre facade, three views" />
             <span class="img-composite-label">>/ Kinetic Facade System · Operable Wood Louvres · Three Views</span>
           </div>
         </div>
@@ -258,7 +258,7 @@
         <!-- IMAGE COMPOSITE — MODULAR -->
         <div class="img-composite">
           <div class="img-composite-frame">
-            <img src="Images_Metadata/Images/modular.png" alt="Modular architecture — stacked container modules, three views" />
+            <img loading="lazy" src="Images_Metadata/Images/modular.png" alt="Modular architecture — stacked container modules, three views" />
             <span class="img-composite-label">>/ Modular Container System · Stacked Units · Three Views</span>
           </div>
         </div>
@@ -282,7 +282,7 @@
         <!-- IMAGE COMPOSITE — TRANSFORMABLE -->
         <div class="img-composite">
           <div class="img-composite-frame">
-            <img src="Images_Metadata/Images/transformable.png" alt="Transformable architecture — deployable expanding structure, three views" />
+            <img loading="lazy" src="Images_Metadata/Images/transformable.png" alt="Transformable architecture — deployable expanding structure, three views" />
             <span class="img-composite-label">>/ Transformable Deploy System · Expanding Structure · Three Views</span>
           </div>
         </div>
@@ -451,7 +451,7 @@
       </div>
       <div class="showcase-img">
         <div class="showcase-img-frame">
-          <img src="Images_Metadata/Images/daatchi.png" alt="DAATCHI — metamodular retail architecture, Doha and Los Angeles" />
+          <img loading="lazy" src="Images_Metadata/Images/daatchi.png" alt="DAATCHI — metamodular retail architecture, Doha and Los Angeles" />
           <span class="showcase-img-label">>/ DAATCHI · Kinetic Retail Module · Doha HIA · Los Angeles · Saint Angels</span>
         </div>
       </div>
@@ -476,7 +476,7 @@
       </div>
       <div class="showcase-img">
         <div class="showcase-img-frame">
-          <img src="Images_Metadata/Images/atinnitus_project.png" alt="ATINNITUS — transformable mobile music studio on truck" />
+          <img loading="lazy" src="Images_Metadata/Images/atinnitus_project.png" alt="ATINNITUS — transformable mobile music studio on truck" />
           <span class="showcase-img-label">>/ ATINNITUS · Transformable Mobile Studio · Heavy-Haul Deploy</span>
         </div>
       </div>
@@ -502,7 +502,7 @@
       </div>
       <div class="showcase-img">
         <div class="showcase-img-frame">
-          <img src="Images_Metadata/Images/onsofa_project.png" alt="ONSOFA — robotic metamodular transformable sofa for AI and XR" />
+          <img loading="lazy" src="Images_Metadata/Images/onsofa_project.png" alt="ONSOFA — robotic metamodular transformable sofa for AI and XR" />
           <span class="showcase-img-label">>/ ONSOFA · Robotic Metamodular Sofa · AI-XR Platform · Five Modes</span>
         </div>
       </div>
@@ -539,7 +539,7 @@
         </div>
       </div>
       <div class="dsdt-card-img">
-        <img src="Images_Metadata/Images/dsdt_california.png" alt="DSDT California — transformable kinetic architecture concept" />
+        <img loading="lazy" src="Images_Metadata/Images/dsdt_california.png" alt="DSDT California — transformable kinetic architecture concept" />
         <span class="dsdt-img-label">>/ DSDT · Transformable Kinetic Architecture · California · Concept 01</span>
       </div>
     </div>
@@ -575,7 +575,7 @@
         </div>
       </div>
       <div class="dsdt-card-img">
-        <img src="Images_Metadata/Images/dsdt_losangeles.png" alt="DSDT Los Angeles — kinetic landmark architecture concept" />
+        <img loading="lazy" src="Images_Metadata/Images/dsdt_losangeles.png" alt="DSDT Los Angeles — kinetic landmark architecture concept" />
         <span class="dsdt-img-label">>/ DSDT · Kinetic Landmark · Silicon Beach Los Angeles · Concept 02</span>
       </div>
     </div>
@@ -611,7 +611,7 @@
         </div>
       </div>
       <div class="dsdt-card-img">
-        <img src="Images_Metadata/Images/dsdt_sanfrancisco.png" alt="DSDT San Francisco — transformable VC headquarters concept" />
+        <img loading="lazy" src="Images_Metadata/Images/dsdt_sanfrancisco.png" alt="DSDT San Francisco — transformable VC headquarters concept" />
         <span class="dsdt-img-label">>/ DSDT · Transformable VC HQ · San Francisco Silicon Valley · Concept 03</span>
       </div>
     </div>
@@ -705,80 +705,54 @@
 
   <script src="typing.js"></script>
   <script>
-    (function () {
-      var bar     = document.getElementById('preBar');
-      var counter = document.getElementById('preCounter');
-      var btn     = document.getElementById('preEnter');
-      var loader  = document.getElementById('preloader');
-      var body    = document.body;
+    (function() {
+      const bar     = document.getElementById('preBar');
+      const counter = document.getElementById('preCounter');
+      const btn     = document.getElementById('preEnter');
+      const loader  = document.getElementById('preloader');
+      const body    = document.body;
 
-      var IMAGES = [
-        'Images_Metadata/Images/hero_bg.png',
-        'Images_Metadata/Images/kinetic.png',
-        'Images_Metadata/Images/modular.png',
-        'Images_Metadata/Images/transformable.png',
-        'Images_Metadata/Images/daatchi.png',
-        'Images_Metadata/Images/atinnitus_project.png',
-        'Images_Metadata/Images/onsofa_project.png',
-        'Images_Metadata/Images/dsdt_california.png',
-        'Images_Metadata/Images/dsdt_losangeles.png',
-        'Images_Metadata/Images/dsdt_sanfrancisco.png'
-      ];
+      // Collect every image src on the page (including lazy ones)
+      const allImgs = Array.from(document.querySelectorAll('img[src]'));
+      const total   = allImgs.length;
+      let loaded    = 0;
 
-      var total      = IMAGES.length;
-      var loaded     = 0;
-      var displayPct = 0;
+      function setProgress(val) {
+        const pct = Math.min(100, Math.floor(val));
+        bar.style.width = pct + '%';
+        counter.textContent = '>/ ' + pct + '%';
+        if (pct >= 100) {
+          setTimeout(() => btn.classList.add('visible'), 400);
+        }
+      }
 
-      // Smoothly count up display from current to target, then call done()
-      function animateTo(target, done) {
-        function tick() {
-          if (displayPct < target) {
-            displayPct++;
-            bar.style.width = displayPct + '%';
-            counter.textContent = '>/ ' + displayPct + '%';
-            setTimeout(tick, 18); // ~18ms per percent step — visible but fast
+      function onImageDone() {
+        loaded++;
+        setProgress((loaded / total) * 100);
+      }
+
+      if (total === 0) {
+        setProgress(100);
+      } else {
+        // Force-fetch every image regardless of lazy attribute
+        // so the browser loads them all before we hit 100%
+        allImgs.forEach(img => {
+          // Remove lazy so browser loads immediately
+          img.removeAttribute('loading');
+
+          if (img.complete && img.naturalWidth > 0) {
+            onImageDone();
           } else {
-            if (done) done();
+            img.addEventListener('load',  onImageDone, { once: true });
+            img.addEventListener('error', onImageDone, { once: true });
           }
-        }
-        tick();
+        });
       }
 
-      // Load images one at a time using fetch so each one is a real
-      // network request that fills the browser cache at the true URL
-      function loadNext(index) {
-        if (index >= total) {
-          animateTo(100, function () {
-            setTimeout(function () { btn.classList.add('visible'); }, 400);
-          });
-          return;
-        }
-
-        var targetPct = Math.round(((index + 1) / total) * 100);
-
-        fetch(IMAGES[index], { cache: 'reload' })
-          .then(function (r) { return r.blob(); })
-          .catch(function () {}) // errors still advance progress
-          .finally(function () {
-            loaded++;
-            animateTo(targetPct, function () {
-              loadNext(index + 1);
-            });
-          });
-      }
-
-      loadNext(0);
-
-      // 90s safety net
-      var safety = setTimeout(function () {
-        displayPct = 100;
-        bar.style.width = '100%';
-        counter.textContent = '>/ 100%';
-        btn.classList.add('visible');
-      }, 90000);
-
-      btn.addEventListener('click', function () {
-        clearTimeout(safety);
+      // Safety net: if something stalls for >15s, force complete
+      const safetyTimer = setTimeout(() => setProgress(100), 15000);
+      btn.addEventListener('click', () => {
+        clearTimeout(safetyTimer);
         loader.classList.add('hidden');
         body.classList.remove('loading');
       }, { once: true });
