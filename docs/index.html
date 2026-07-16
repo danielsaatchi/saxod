@@ -706,15 +706,13 @@
   <script src="typing.js"></script>
   <script>
     (function () {
-      const bar    = document.getElementById('preBar');
-      const counter= document.getElementById('preCounter');
-      const btn    = document.getElementById('preEnter');
-      const loader = document.getElementById('preloader');
-      const body   = document.body;
+      var bar     = document.getElementById('preBar');
+      var counter = document.getElementById('preCounter');
+      var btn     = document.getElementById('preEnter');
+      var loader  = document.getElementById('preloader');
+      var body    = document.body;
 
-      // Every image path used in the site — listed explicitly
-      // so the browser fetches them all immediately, no DOM dependency
-      const IMAGES = [
+      var IMAGES = [
         'Images_Metadata/Images/hero_bg.png',
         'Images_Metadata/Images/kinetic.png',
         'Images_Metadata/Images/modular.png',
@@ -727,34 +725,57 @@
         'Images_Metadata/Images/dsdt_sanfrancisco.png'
       ];
 
-      const total = IMAGES.length;
-      let loaded  = 0;
+      var total      = IMAGES.length;
+      var loaded     = 0;
+      var displayPct = 0;
 
-      function onDone() {
-        loaded++;
-        const pct = Math.round((loaded / total) * 100);
-        bar.style.width = pct + '%';
-        counter.textContent = '>/ ' + pct + '%';
-        if (loaded >= total) {
-          // All images in memory — show enter button
-          setTimeout(() => btn.classList.add('visible'), 300);
+      // Smoothly count up display from current to target, then call done()
+      function animateTo(target, done) {
+        function tick() {
+          if (displayPct < target) {
+            displayPct++;
+            bar.style.width = displayPct + '%';
+            counter.textContent = '>/ ' + displayPct + '%';
+            setTimeout(tick, 18); // ~18ms per percent step — visible but fast
+          } else {
+            if (done) done();
+          }
         }
+        tick();
       }
 
-      // Force every image to download fully before we allow entry
-      IMAGES.forEach(function (src) {
-        var img = new Image();
-        img.onload  = onDone;
-        img.onerror = onDone; // still count errors so we don't stall
-        img.src = src;
-      });
+      // Load images one at a time using fetch so each one is a real
+      // network request that fills the browser cache at the true URL
+      function loadNext(index) {
+        if (index >= total) {
+          animateTo(100, function () {
+            setTimeout(function () { btn.classList.add('visible'); }, 400);
+          });
+          return;
+        }
 
-      // Safety net: 30s max then unlock regardless
+        var targetPct = Math.round(((index + 1) / total) * 100);
+
+        fetch(IMAGES[index], { cache: 'reload' })
+          .then(function (r) { return r.blob(); })
+          .catch(function () {}) // errors still advance progress
+          .finally(function () {
+            loaded++;
+            animateTo(targetPct, function () {
+              loadNext(index + 1);
+            });
+          });
+      }
+
+      loadNext(0);
+
+      // 90s safety net
       var safety = setTimeout(function () {
+        displayPct = 100;
         bar.style.width = '100%';
         counter.textContent = '>/ 100%';
         btn.classList.add('visible');
-      }, 30000);
+      }, 90000);
 
       btn.addEventListener('click', function () {
         clearTimeout(safety);
