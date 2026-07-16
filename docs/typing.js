@@ -1,11 +1,10 @@
 // typing.js
-document.addEventListener("DOMContentLoaded", () => {
+function initTyping() {
   const typingSpeed = 8; // ms per character
-  const baseDelay = 0;    // you can offset all lines if you want
+  const baseDelay = 0;
 
   const lines = Array.from(document.querySelectorAll(".type-line"));
 
-  // Prepare each element: store full text & clear it
   lines.forEach((el) => {
     const fullText = el.textContent.trim();
     const customSpeed = el.getAttribute("data-speed");
@@ -14,13 +13,10 @@ document.addEventListener("DOMContentLoaded", () => {
     el.dataset.fullText = fullText;
     el.textContent = "";
 
-    // Optional: define per-line speed and delay
     el.dataset.typingSpeed = customSpeed ? Number(customSpeed) : typingSpeed;
-    el.dataset.delay =
-      delayAttr !== null ? Number(delayAttr) : baseDelay;
+    el.dataset.delay = delayAttr !== null ? Number(delayAttr) : baseDelay;
   });
 
-  // Type one element
   function typeElement(el) {
     const text = el.dataset.fullText || "";
     const speed = Number(el.dataset.typingSpeed) || typingSpeed;
@@ -43,9 +39,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }, speed);
   }
 
-  // Schedule all elements with their delays
   lines.forEach((el) => {
     const delay = Number(el.dataset.delay) || 0;
     setTimeout(() => typeElement(el), delay);
   });
-});
+}
+
+// Works whether DOM is already ready or not
+if (document.readyState === 'loading') {
+  document.addEventListener("DOMContentLoaded", initTyping);
+} else {
+  initTyping();
+}
